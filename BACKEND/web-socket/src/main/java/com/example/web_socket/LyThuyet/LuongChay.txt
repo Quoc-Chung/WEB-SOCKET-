@@ -1,0 +1,43 @@
+1. Client kết nối đến /ws?userId=ABC → afterConnectionEstablished() được gọi
+  @Override
+  public void afterConnectionEstablished(WebSocketSession session) {
+    String userId = getUserId(session);
+    sessions.put(userId, session);
+
+    - IN RA CÁI NÀY Ở BACKEND -
+    System.out.println(userId + " connected");
+  }
+
+
+
+2. Client gửi tin nhắn dạng JSON:
+{
+  "to": "DEF",
+  "from": "ABC",
+  "message": "Hello"
+}
+
+
+
+
+3. handleTextMessage() xử lý và chuyển tiếp tin nhắn
+  @Override
+  protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    Map<String, String> msg = new ObjectMapper().readValue(message.getPayload(), Map.class);
+    String to = msg.get("to");
+    String from = msg.get("from");
+    String text = msg.get("message");
+
+    WebSocketSession receiver = sessions.get(to);
+    if (receiver != null && receiver.isOpen()) {
+      receiver.sendMessage(new TextMessage("From " + from + ": " + text));
+    }
+  }
+
+
+
+4. Khi client ngắt kết nối → afterConnectionClosed() dọn dẹp session
+   @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+      sessions.values().removeIf(s -> s.getId().equals(session.getId()));
+    }

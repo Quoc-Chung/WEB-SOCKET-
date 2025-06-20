@@ -1,0 +1,6 @@
+Thư viện jackson-databind là một phần của bộ thư viện Jackson, được sử dụng rộng rãi trong các ứng dụng Java để xử lý JSON. Khi bạn thêm dependency này vào dự án, bạn có thể:
+
+Đọc JSON: Chuyển JSON thành các đối tượng Java (POJO - Plain Old Java Object).
+Ghi JSON: Chuyển các đối tượng Java thành chuỗi JSON.
+Xử lý các thao tác phức tạp hơn như ánh xạ JSON vào các cấu trúc dữ liệu phức tạp, tùy chỉnh định dạng, hoặc xử lý các trường hợp đặc biệt.
+

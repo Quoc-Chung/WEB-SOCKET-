@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useRef, useState } from 'react'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [userId, setUserId] = useState("");
+  const [toUser, setToUser] = useState("");
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
+  const socketRef = useRef(null);
+
+  const connectSocket = () => {
+    socketRef.current = new WebSocket(`ws://localhost:8080/ws?userId=${userId}`);
+
+    socketRef.current.onopen = () => console.log("Connected");
+    socketRef.current.onmessage = (e) => setMessages((prev) => [...prev, e.data]);
+  };
+
+  const sendMessage = () => {
+    socketRef.current.send(
+      JSON.stringify({ from: userId, to: toUser, message: input })
+    );
+    setInput("");
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div style={{ padding: 20 }}>
+      <h2>Chat WebSocket App</h2>
+      <input placeholder="Your ID" value={userId} onChange={e => setUserId(e.target.value)} />
+      <button onClick={connectSocket}>Connect</button>
+      <br /><br />
+      <input placeholder="To (User ID)" value={toUser} onChange={e => setToUser(e.target.value)} />
+      <input value={input} onChange={e => setInput(e.target.value)} placeholder="Message" />
+      <button onClick={sendMessage}>Send</button>
+      <ul>
+        {messages.map((msg, i) => <li key={i}>{msg}</li>)}
+      </ul>
+    </div>
+  );
+};
 
 export default App
